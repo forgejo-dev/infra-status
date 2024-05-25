@@ -1,0 +1,1 @@
+status ansible_host=status.forgejo.dev ansible_user=maxkratz ansible_port="{{ sshd_port }}"

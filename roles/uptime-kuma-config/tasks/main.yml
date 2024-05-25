@@ -1,0 +1,91 @@
+#
+# Configuration and setup
+#
+
+- name: Include vars
+  ansible.builtin.include_vars:
+    file: uptime-kuma.yml
+    name: uptime_kuma_config
+
+- name: Install dependency
+  ansible.builtin.shell:
+    cmd: pip3 install uptime-kuma-api --break-system-packages
+
+- name: Specify the initial username and password
+  lucasheld.uptime_kuma.setup:
+    api_url: https://{{ status_url }}
+    api_username: "{{ uptime_kuma_config.user }}"
+    api_password: "{{ uptime_kuma_config.password }}"
+
+- name: Login with credentials once and register the result
+  lucasheld.uptime_kuma.login:
+    api_url: https://{{ status_url }}
+    api_username: "{{ uptime_kuma_config.user }}"
+    api_password: "{{ uptime_kuma_config.password }}"
+  register: result
+
+- name: Extract the token from the result and set it as fact
+  set_fact:
+    api_token: "{{ result.token }}"
+
+#
+# Monitors
+#
+
+- name: Create monitor for forgejo website
+  lucasheld.uptime_kuma.monitor:
+    api_url: https://{{ status_url }}
+    api_token: "{{ api_token }}"
+    name: website
+    type: http
+    url: https://forgejo.dev
+    state: present
+
+#
+# Status pages
+#
+
+- name: Add forgejo status page
+  lucasheld.uptime_kuma.status_page:
+    api_url: https://{{ status_url }}
+    api_token: "{{ api_token }}"
+    slug: forgejo
+    title: forgejo
+    description: Services provided by forgejo.dev
+    publicGroupList:
+      - name: web
+        weight: 1
+        monitorList:
+          - name: website
+    state: present
+    theme: dark
+
+#
+# Configuration (settings)
+#
+
+- name: Configure general settings
+  lucasheld.uptime_kuma.settings:
+    api_url: https://{{ status_url }}
+    api_token: "{{ api_token }}"  
+    entryPage: "statusPage-forgejo"
+    primaryBaseURL: https://{{ status_url }}
+    trustProxy: true
+
+#
+# Notifications
+#
+
+- name: Add notification
+  lucasheld.uptime_kuma.notification:
+    api_url: https://{{ status_url }}
+    api_token: "{{ api_token }}" 
+    name: ntfy
+    type: ntfy
+    isDefault: true
+    applyExisting: true
+    ntfytopic: statusforgejodev
+    ntfyserverurl: https://ntfy.sh
+    ntfyPriority: 5
+    ntfyAuthenticationMethod: none
+    state: present

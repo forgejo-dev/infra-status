@@ -1,0 +1,14 @@
+---
+
+#
+# Configuration for the SSH access.
+#
+
+sshd_port: "50001"
+
+#
+# Configuraion of URLs etc.
+#
+
+status_url: "status.forgejo.dev"
+

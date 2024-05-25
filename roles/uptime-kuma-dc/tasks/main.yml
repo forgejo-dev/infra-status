@@ -1,0 +1,25 @@
+---
+- name: Create project directory
+  ansible.builtin.file:
+    path: /srv/docker-compose/forgejo-uptime-kuma
+    state: directory
+    mode: '0755'
+
+- name: Copy docker compose files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /srv/docker-compose/forgejo-uptime-kuma/{{ item }}
+    mode: 0644
+  with_items:
+    - docker-compose.yml
+
+# - name: Deploy docker compose stack
+#   community.docker.docker_compose:
+#     project_src: /srv/docker-compose/forgejo-uptime-kuma/
+#     files:
+#       - docker-compose.yml
+#     remove_orphans: true
+- name: Deploy docker compose stack
+  ansible.builtin.shell:
+    cmd: docker compose up -d --remove-orphans
+    chdir: /srv/docker-compose/forgejo-uptime-kuma/

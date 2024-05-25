@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+  forgejo-uptime-kuma:
+    image: louislam/uptime-kuma:1.22.1
+    container_name: forgejo-uptime-kuma
+    volumes:
+      - ./data:/app/data
+    # ports:
+      # - 3001:3001  # <Host Port>:<Container Port>
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST={{ status_url }}
+      - VIRTUAL_PORT=3001
+      - LETSENCRYPT_HOST={{ status_url }}
+    networks:
+      - web
+
+networks:
+  web:
+    external:
+      name: webshare
