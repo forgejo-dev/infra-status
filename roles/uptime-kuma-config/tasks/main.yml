@@ -32,13 +32,31 @@
 # Monitors
 #
 
-- name: Create monitor for forgejo website
+- name: Create monitor for forgejo itself
   lucasheld.uptime_kuma.monitor:
     api_url: https://{{ status_url }}
     api_token: "{{ api_token }}"
-    name: website
+    name: app
     type: http
     url: https://forgejo.dev
+    state: present
+
+- name: Create monitor for CI
+  lucasheld.uptime_kuma.monitor:
+    api_url: https://{{ status_url }}
+    api_token: "{{ api_token }}"
+    name: ci
+    type: http
+    url: https://ci.forgejo.dev
+    state: present
+
+- name: Create monitor for S3
+  lucasheld.uptime_kuma.monitor:
+    api_url: https://{{ status_url }}
+    api_token: "{{ api_token }}"
+    name: s3
+    type: http
+    url: https://console.s3.forgejo.dev
     state: present
 
 #
@@ -56,7 +74,9 @@
       - name: web
         weight: 1
         monitorList:
-          - name: website
+          - name: app
+          - name: ci
+          - name: s3
     state: present
     theme: dark
 
