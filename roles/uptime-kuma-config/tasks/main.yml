@@ -11,11 +11,11 @@
   ansible.builtin.shell:
     cmd: pip3 install uptime-kuma-api --break-system-packages
 
-- name: Specify the initial username and password
-  lucasheld.uptime_kuma.setup:
-    api_url: https://{{ status_url }}
-    api_username: "{{ uptime_kuma_config.user }}"
-    api_password: "{{ uptime_kuma_config.password }}"
+# - name: Specify the initial username and password
+#   lucasheld.uptime_kuma.setup:
+#     api_url: https://{{ status_url }}
+#     api_username: "{{ uptime_kuma_config.user }}"
+#     api_password: "{{ uptime_kuma_config.password }}"
 
 - name: Login with credentials once and register the result
   lucasheld.uptime_kuma.login:
